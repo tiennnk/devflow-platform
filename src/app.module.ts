@@ -4,9 +4,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 
 import { AppController } from './app.controller';
+
 import { AppService } from './app.service';
+
 import { TasksModule } from './tasks/tasks.module';
 import { AuthModule } from './auth/auth.module';
+import { LoggerModule } from 'src/logger/logger.module';
+import { LogsModule } from './logs/logs.module';
 
 import { BullModule } from '@nestjs/bullmq';
 
@@ -50,7 +54,9 @@ import { BullModule } from '@nestjs/bullmq';
       })
     }),
     TasksModule,
-    AuthModule
+    AuthModule,
+    LoggerModule,
+    LogsModule
   ],
   controllers: [AppController],
   providers: [AppService]

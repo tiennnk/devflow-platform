@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -9,13 +9,18 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
     @InjectQueue('tasks')
-    private readonly tasksQueue: Queue
+    private readonly tasksQueue: Queue,
+    @Inject(WINSTON_MODULE_PROVIDER)
+    private readonly logger: Logger
   ) {}
 
   async getTasks(userId: number): Promise<Task[]> {
@@ -28,6 +33,7 @@ export class TasksService {
     const task = await this.taskRepository.findOneBy({ id });
 
     if (!task) {
+      this.logger.error(`Task #${id} not found`);
       throw new NotFoundException(`Task #${id} not found`);
     }
 
@@ -39,6 +45,8 @@ export class TasksService {
 
     const savedTask = await this.taskRepository.save(newTask);
     await this.tasksQueue.add('task:created', savedTask);
+
+    this.logger.log('info', `Task created: ${savedTask.id} by user ${userId}`);
 
     return savedTask;
   }
