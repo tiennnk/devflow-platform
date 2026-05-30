@@ -1,12 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TasksController } from './tasks.controller';
+import { TasksService } from './tasks.service';
 
 describe('TasksController', () => {
   let controller: TasksController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [TasksController]
+      controllers: [TasksController],
+      providers: [
+        {
+          provide: TasksService,
+          useValue: {
+            getTasks: jest.fn(),
+            getTaskById: jest.fn(),
+            createTask: jest.fn(),
+            updateTask: jest.fn()
+          }
+        }
+      ]
     }).compile();
 
     controller = module.get<TasksController>(TasksController);

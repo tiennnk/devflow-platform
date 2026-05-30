@@ -1,33 +1,36 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTaskDto } from './dto/create-task.dto';
+import { Test, TestingModule } from '@nestjs/testing';
+import { TasksService } from './tasks.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { getQueueToken } from '@nestjs/bullmq';
+import { Task } from './task.entity';
 
-@Injectable()
-export class TasksService {
-  private tasks = [
-    {
-      id: 1,
-      title: 'Setup NestJS project',
-      status: 'DONE'
-    }
-  ];
+describe('TasksService', () => {
+  let service: TasksService;
 
-  getTasks() {
-    return this.tasks;
-  }
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        TasksService,
+        {
+          provide: getRepositoryToken(Task),
+          useValue: {
+            find: jest.fn(),
+            findOneBy: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn()
+          }
+        },
+        {
+          provide: getQueueToken('tasks'),
+          useValue: { add: jest.fn() }
+        }
+      ]
+    }).compile();
 
-  createTask(body: CreateTaskDto) {
-    const newTask = {
-      id: this.tasks.length + 1,
-      title: body.title,
-      status: 'TODO'
-    };
+    service = module.get<TasksService>(TasksService);
+  });
 
-    this.tasks.push(newTask);
-
-    return newTask;
-  }
-
-  getTaskById(id: number) {
-    return this.tasks.find((task) => task.id === id);
-  }
-}
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+});
