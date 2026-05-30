@@ -6,14 +6,16 @@ import { Task } from './task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 
-import { EventsGateway } from '../events/events.gateway';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
-    private readonly eventsGateway: EventsGateway
+    @InjectQueue('tasks')
+    private readonly tasksQueue: Queue
   ) {}
 
   async getTasks(userId: number): Promise<Task[]> {
@@ -36,7 +38,7 @@ export class TasksService {
     const newTask = this.taskRepository.create({ title: body.title, user: { id: userId } });
 
     const savedTask = await this.taskRepository.save(newTask);
-    this.eventsGateway.emitTaskCreated(savedTask);
+    await this.tasksQueue.add('task:created', savedTask);
 
     return savedTask;
   }
