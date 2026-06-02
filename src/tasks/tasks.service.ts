@@ -24,7 +24,9 @@ export class TasksService {
   ) {}
 
   async getTasks(userId: number): Promise<Task[]> {
-    const tasks = await this.taskRepository.find({ where: { user: { id: userId } } });
+    const tasks = await this.taskRepository.find({
+      where: { user: { id: userId } }
+    });
 
     return tasks;
   }
@@ -41,7 +43,10 @@ export class TasksService {
   }
 
   async createTask(body: CreateTaskDto, userId: number): Promise<Task> {
-    const newTask = this.taskRepository.create({ title: body.title, user: { id: userId } });
+    const newTask = this.taskRepository.create({
+      title: body.title,
+      user: { id: userId }
+    });
 
     const savedTask = await this.taskRepository.save(newTask);
     await this.tasksQueue.add('task:created', savedTask);
