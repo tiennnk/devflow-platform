@@ -38,7 +38,7 @@ export class AuthService {
       throw new ConflictException('Email already in use');
     }
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const newUser = await this.usersService.createUser(dto.email, hashedPassword);
-    return { id: newUser.id, email: newUser.email };
+    const newUser = await this.usersService.createUser(dto.username, dto.email, hashedPassword);
+    return { id: newUser.id, email: newUser.email, username: newUser.username };
   }
 }

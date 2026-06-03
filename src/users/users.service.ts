@@ -17,8 +17,8 @@ export class UsersService {
     return user;
   }
 
-  async createUser(email: string, hashedPassword: string): Promise<User> {
-    const newUser = this.userRepository.create({ email, password: hashedPassword });
+  async createUser(username: string, email: string, hashedPassword: string): Promise<User> {
+    const newUser = this.userRepository.create({ username, email, password: hashedPassword });
 
     return this.userRepository.save(newUser);
   }
