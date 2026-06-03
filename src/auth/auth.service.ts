@@ -16,7 +16,7 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginDto) {
-    const user = await this.usersService.findByEmail(dto.email);
+    const user = (await this.usersService.findByUsername(dto.usernameOrEmail)) ?? (await this.usersService.findByEmail(dto.usernameOrEmail));
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -26,17 +26,19 @@ export class AuthService {
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, username: user.username };
     return {
       access_token: await this.jwtService.signAsync(payload)
     };
   }
 
   async register(dto: RegisterDto) {
+    const existingUsername = await this.usersService.findByUsername(dto.username);
+    if (existingUsername) throw new ConflictException('username_taken');
+
     const user = await this.usersService.findByEmail(dto.email);
-    if (user) {
-      throw new ConflictException('Email already in use');
-    }
+    if (user) throw new ConflictException('email_taken');
+
     const hashedPassword = await bcrypt.hash(dto.password, 10);
     const newUser = await this.usersService.createUser(dto.username, dto.email, hashedPassword);
     return { id: newUser.id, email: newUser.email, username: newUser.username };

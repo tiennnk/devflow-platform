@@ -61,6 +61,9 @@ export class TasksService {
 
     task.status = body.status;
 
-    return this.taskRepository.save(task);
+    const saved = await this.taskRepository.save(task);
+    await this.tasksQueue.add('task:updated', saved);
+
+    return saved;
   }
 }

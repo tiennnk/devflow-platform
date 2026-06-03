@@ -12,9 +12,11 @@ export class UsersService {
   ) {}
 
   async findByEmail(email: string): Promise<User | null> {
-    const user = await this.userRepository.findOneBy({ email });
+    return this.userRepository.findOneBy({ email });
+  }
 
-    return user;
+  async findByUsername(username: string): Promise<User | null> {
+    return this.userRepository.findOneBy({ username });
   }
 
   async createUser(username: string, email: string, hashedPassword: string): Promise<User> {
