@@ -47,6 +47,7 @@ export class TasksService {
       title: body.title,
       user: { id: userId }
     });
+    if (body.status) newTask.status = body.status;
 
     const savedTask = await this.taskRepository.save(newTask);
     await this.tasksQueue.add('task:created', savedTask);
@@ -59,11 +60,19 @@ export class TasksService {
   async updateTask(id: number, body: UpdateTaskDto): Promise<Task> {
     const task = await this.getTaskById(id);
 
-    task.status = body.status;
+    task.title = body.title ?? task.title;
+    task.status = body.status ?? task.status;
 
     const saved = await this.taskRepository.save(task);
     await this.tasksQueue.add('task:updated', saved);
 
     return saved;
+  }
+
+  async deleteTask(id: number): Promise<void> {
+    const task = await this.getTaskById(id);
+    await this.taskRepository.remove(task);
+    await this.tasksQueue.add('task:deleted', { id });
+    this.logger.log('info', `Task deleted: ${id}`);
   }
 }

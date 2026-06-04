@@ -15,6 +15,9 @@ export class TasksProcessor extends WorkerHost {
     if (job.name === 'task:updated') {
       this.eventsGateway.emitTaskUpdated(job.data);
     }
+    if (job.name === 'task:deleted') {
+      this.eventsGateway.emitTaskDeleted(job.data as { id: number });
+    }
     return Promise.resolve();
   }
 }

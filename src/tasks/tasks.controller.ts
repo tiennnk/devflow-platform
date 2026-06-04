@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
@@ -34,9 +34,16 @@ export class TasksController {
     return this.tasksService.createTask(body, user.userId);
   }
 
-  @ApiOperation({ summary: 'Update task status' })
+  @ApiOperation({ summary: 'Update task' })
   @Patch(':id')
   updateTask(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateTaskDto) {
     return this.tasksService.updateTask(id, body);
+  }
+
+  @ApiOperation({ summary: 'Delete task' })
+  @Delete(':id')
+  @HttpCode(204)
+  deleteTask(@Param('id', ParseIntPipe) id: number) {
+    return this.tasksService.deleteTask(id);
   }
 }

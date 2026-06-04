@@ -1,0 +1,30 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: #0c969b;
+  --color-primary-hover: #0a8085;
+  --color-primary-foreground: #ffffff;
+
+  --color-background: #ffffff;
+  --color-foreground: #171717;
+
+  --color-todo: #f59e0b;
+  --color-in-progress: #3b82f6;
+  --color-done: #10b981;
+
+  --font-poppins: 'Poppins', sans-serif;
+  --font-family-sans: var(--font-poppins), Arial, sans-serif;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-family-sans);
+}

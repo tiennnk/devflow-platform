@@ -18,4 +18,8 @@ export class EventsGateway {
   emitTaskUpdated(task: { id: number; title: string; status: string }) {
     this.server.emit('task:updated', task);
   }
+
+  emitTaskDeleted(data: { id: number }) {
+    this.server.emit('task:deleted', data);
+  }
 }
