@@ -24,8 +24,8 @@ export class TasksController {
 
   @ApiOperation({ summary: 'Get task by ID' })
   @Get(':id')
-  getTaskById(@Param('id', ParseIntPipe) id: number) {
-    return this.tasksService.getTaskById(id);
+  getTaskById(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: { userId: number }) {
+    return this.tasksService.getTaskById(id, user.userId);
   }
 
   @ApiOperation({ summary: 'Create a new task' })
@@ -36,14 +36,14 @@ export class TasksController {
 
   @ApiOperation({ summary: 'Update task' })
   @Patch(':id')
-  updateTask(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateTaskDto) {
-    return this.tasksService.updateTask(id, body);
+  updateTask(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateTaskDto, @CurrentUser() user: { userId: number }) {
+    return this.tasksService.updateTask(id, body, user.userId);
   }
 
   @ApiOperation({ summary: 'Delete task' })
   @Delete(':id')
   @HttpCode(204)
-  deleteTask(@Param('id', ParseIntPipe) id: number) {
-    return this.tasksService.deleteTask(id);
+  deleteTask(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: { userId: number }) {
+    return this.tasksService.deleteTask(id, user.userId);
   }
 }

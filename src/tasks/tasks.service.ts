@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -31,12 +31,19 @@ export class TasksService {
     return tasks;
   }
 
-  async getTaskById(id: number): Promise<Task> {
-    const task = await this.taskRepository.findOneBy({ id });
+  async getTaskById(id: number, userId: number): Promise<Task> {
+    const task = await this.taskRepository.findOne({
+      where: { id },
+      relations: { user: true }
+    });
 
     if (!task) {
       this.logger.error(`Task #${id} not found`);
       throw new NotFoundException(`Task #${id} not found`);
+    }
+
+    if (task.user.id !== userId) {
+      throw new ForbiddenException(`You do not have access to task #${id}`);
     }
 
     return task;
@@ -57,8 +64,8 @@ export class TasksService {
     return savedTask;
   }
 
-  async updateTask(id: number, body: UpdateTaskDto): Promise<Task> {
-    const task = await this.getTaskById(id);
+  async updateTask(id: number, body: UpdateTaskDto, userId: number): Promise<Task> {
+    const task = await this.getTaskById(id, userId);
 
     task.title = body.title ?? task.title;
     task.status = body.status ?? task.status;
@@ -69,8 +76,8 @@ export class TasksService {
     return saved;
   }
 
-  async deleteTask(id: number): Promise<void> {
-    const task = await this.getTaskById(id);
+  async deleteTask(id: number, userId: number): Promise<void> {
+    const task = await this.getTaskById(id, userId);
     await this.taskRepository.remove(task);
     await this.tasksQueue.add('task:deleted', { id });
     this.logger.log('info', `Task deleted: ${id}`);
