@@ -2,6 +2,8 @@
 
 DevFlow Platform by tiennnk (Tien Nguyen)
 
+- DevFlow — Real-time Task Management Platform
+
 ## What This Project Includes
 
 - **Backend Framework:** NestJS (Node.js) with TypeScript, modular architecture.
